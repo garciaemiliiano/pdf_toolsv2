@@ -47,10 +47,10 @@ async def count_pages(file: UploadFile):
 async def merge(files: list[UploadFile]):
     try:
         root_path = settings.upload_folder
-        if len(files) > 1:
+        if len(files):
             return await _merge(files, root_path)
         else:
-            raise Exception("number of files less than or equal to 1")
+            raise Exception("error_missing_file")
     except BaseException as exception:
         error_type, file_error, line_error = _formatError()
         error = _Error(exception, error_type, file_error, line_error)
