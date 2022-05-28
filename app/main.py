@@ -24,10 +24,9 @@ async def count_pages(file: UploadFile):
     file_content = file.file
     if file_content:
         try:
-            file_path = os.path.join(root_path, filename)
-            await download_file(file, root_path, filename)
-            pages = await _count_pages(file_path)
-            await delete_file(file_path)
+            filename = await download_file(file, root_path, filename)
+            pages = await _count_pages(os.path.join(root_path, filename))
+            await delete_file(os.path.join(root_path, filename))
             return {"nombre_archivo": filename, "cantidad_paginas": pages}
         except BaseException as exception:
             error_type, file_error, line_error = _formatError()

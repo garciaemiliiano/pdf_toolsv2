@@ -30,6 +30,7 @@ async def download_file(file: UploadFile, root_path: str, filename: str):
         ) as out_file:
             content = await file.read()
             await out_file.write(content)
+        return new_file_name
     except BaseException as exception:
         raise exception
 
