@@ -54,6 +54,7 @@ async def merge(files: list[UploadFile]):
     except BaseException as exception:
         error_type, file_error, line_error = _formatError()
         error = _Error(exception, error_type, file_error, line_error)
+        print(error.returnError())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=error.returnError(),
