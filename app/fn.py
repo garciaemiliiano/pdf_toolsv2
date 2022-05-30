@@ -22,7 +22,7 @@ def _formatError():
     return exc_type, fname, exc_tb.tb_lineno
 
 
-def reset_eof_of_pdf_return_stream(pdf_stream_in: list):
+async def reset_eof_of_pdf_return_stream(pdf_stream_in: list):
     # find the line position of the EOF
     for i, x in enumerate(pdf_stream_in[::-1]):
         if b"%%EOF" in x:
@@ -75,7 +75,7 @@ async def fix_EOF(files: list, root_path: str):
     for f in files:
         with open(os.path.join(root_path, f), "rb") as p:
             txt = p.readlines()
-        txtx = reset_eof_of_pdf_return_stream(txt)
+        txtx = await reset_eof_of_pdf_return_stream(txt)
         with open(os.path.join(root_path, f), "wb") as f:
             f.writelines(txtx)
     return list
