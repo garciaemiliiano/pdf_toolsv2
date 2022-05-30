@@ -22,6 +22,19 @@ def _formatError():
     return exc_type, fname, exc_tb.tb_lineno
 
 
+def reset_eof_of_pdf_return_stream(pdf_stream_in: list):
+    # find the line position of the EOF
+    for i, x in enumerate(pdf_stream_in[::-1]):
+        if b"%%EOF" in x:
+            actual_line = len(pdf_stream_in) - i
+            print(
+                f"EOF found at line position {-i} = actual {actual_line}, with value {x}"
+            )
+            break
+    # return the list up to that point
+    return pdf_stream_in[:actual_line]
+
+
 async def download_file(file: UploadFile, root_path: str, filename: str):
     try:
         new_file_name = await format_file_name(filename)
@@ -58,6 +71,16 @@ async def delete_file(file_path: str):
         raise exception
 
 
+async def fix_EOF(files: list, root_path: str):
+    for f in files:
+        with open(os.path.join(root_path, f), "rb") as p:
+            txt = p.readlines()
+        txtx = reset_eof_of_pdf_return_stream(txt)
+        with open(os.path.join(root_path, f), "wb") as f:
+            f.writelines(txtx)
+    return list
+
+
 async def _merge(files: list[UploadFile], root_path: str):
     try:
         # Descargar pdfs en el root_path
@@ -67,6 +90,8 @@ async def _merge(files: list[UploadFile], root_path: str):
             # print(f"Descargando...  {file.filename}")
             await download_file(file, root_path, file.filename)
             arr_files.append(await format_file_name(file.filename))
+
+        await fix_EOF(arr_files, root_path)
         merger = PdfFileMerger()
         # Inicio del merge
         print("Realizando merge...")
