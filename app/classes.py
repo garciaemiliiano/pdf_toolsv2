@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import logging
 import traceback
 from datetime import datetime
 from settings import settings

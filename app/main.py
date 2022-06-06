@@ -1,7 +1,6 @@
 import uvicorn
 import fastapi
 import traceback
-import logging
 import sys, os
 from fastapi import FastAPI, File, UploadFile, APIRouter, status, HTTPException
 from fastapi.staticfiles import StaticFiles
