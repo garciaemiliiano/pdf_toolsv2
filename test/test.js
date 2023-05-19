@@ -5,7 +5,7 @@ function enviarPDF (requestParams, context, ee, next) {
   try {
     const formData = new FormData()
 
-    formData.append('file', fs.createReadStream('test.pdf'))
+    formData.append('file', fs.createReadStream('files/test.pdf'))
 
     /* const fileNames = ['test1.pdf', 'test2.pdf', 'test3.pdf']; // Array de nombres de archivos PDF
 
