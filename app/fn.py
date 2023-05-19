@@ -1,7 +1,7 @@
 import sys, os, os.path, pypdf, pdfreader, uuid, coloredlogs, logging, unidecode, shutil, aiofiles, aiofile, asyncio
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
-from pypdf import PdfFileMerger, PdfFileReader
+from pypdf import PdfMerger, PdfFileReader
 from pdfreader import PDFDocument
 from classes import _Error
 from aiofile import AIOFile, LineReader, Writer
@@ -23,7 +23,7 @@ async def reset_eof_of_pdf_return_stream(pdf_stream_in: list):
             if b"%%EOF" in x:
                 actual_line = len(pdf_stream_in) - i
                 # logging.warning(">>> EOF found...")
-                logging.warning(">>> EOF fixed")
+                # logging.warning(">>> EOF fixed")
                 return pdf_stream_in[:actual_line]
         logging.warning(">>> EOF not found...")
     except BaseException as exception:
@@ -101,7 +101,7 @@ async def merge_files(files: list(), root_path: str):
     try:
         # Inicio del merge
         logging.info(">>> Realizando merge...")
-        merger = PdfFileMerger(strict=False)
+        merger = PdfMerger(strict=False)
         for pdf in files:
             task_merger = asyncio.create_task(merger_append(root_path, pdf, merger))
             await task_merger

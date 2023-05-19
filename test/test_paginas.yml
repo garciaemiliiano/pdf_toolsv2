@@ -1,13 +1,13 @@
 config:
   target: "http://0.0.0.0:8000"
   phases:
-    - duration: 100
-      arrivalRate: 50
+    - duration: 1
+      arrivalRate: 10
       maxVusers: 50
-      name: Proceso de importación express
+      name: Contar paginas
   processor: "./test.js"
 scenarios:
-  - name: "PDF"
+  - name: "contar paginas"
     flow:
       - post:
           url: "/count_pages"

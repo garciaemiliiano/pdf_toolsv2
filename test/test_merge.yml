@@ -1,0 +1,14 @@
+config:
+  target: "http://0.0.0.0:8000"
+  phases:
+    - duration: 100
+      arrivalRate: 50
+      maxVusers: 50
+      name: Mergear pdfs
+  processor: "./test.js"
+scenarios:
+  - name: "merge files"
+    flow:
+      - post:
+          url: "/merge_files"
+          beforeRequest: enviarMergePDF

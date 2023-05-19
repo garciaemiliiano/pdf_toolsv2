@@ -54,22 +54,23 @@ async def count_pages(file: UploadFile):
             ) from exception
 
 
-@app.post("/merge_files/", status_code=status.HTTP_201_CREATED, tags=["merge"])
+@app.post("/merge_files", status_code=status.HTTP_201_CREATED, tags=["merge"])
 async def merge(files: list[UploadFile]):
-    try:
-        root_path = settings.upload_folder
-        if len(files):
-            return await _merge(files, root_path)
-        else:
-            raise Exception("error_missing_file")
-    except BaseException as exception:
-        error_type, file_error, line_error = _formatError()
-        error = _Error(exception, error_type, file_error, line_error)
-        print(error.returnError())
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=error.returnError(),
-        ) from exception
+    async with concurrency_limit:
+        try:
+            root_path = settings.upload_folder
+            if len(files):
+                return await _merge(files, root_path)
+            else:
+                raise Exception("error_missing_file")
+        except BaseException as exception:
+            error_type, file_error, line_error = _formatError()
+            error = _Error(exception, error_type, file_error, line_error)
+            print(error.returnError())
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=error.returnError(),
+            ) from exception
 
 
 if __name__ == "__main__":

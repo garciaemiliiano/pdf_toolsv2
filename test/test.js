@@ -7,12 +7,31 @@ function enviarPDF (requestParams, context, ee, next) {
 
     formData.append('file', fs.createReadStream('files/test.pdf'))
 
-    /* const fileNames = ['test1.pdf', 'test2.pdf', 'test3.pdf']; // Array de nombres de archivos PDF
+    requestParams.body = formData
+    return next()
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+function enviarMergePDF (requestParams, context, ee, next) {
+  try {
+    const formData = new FormData()
+
+    const fileNames = [
+      'test1.pdf',
+      'test.pdf',
+      'test2.pdf',
+      'test3.pdf',
+      'test4.pdf',
+      'test5.pdf'
+    ] // Array de nombres de archivos PDF
 
     for (const fileName of fileNames) {
-      const fileStream = fs.createReadStream(fileName);
-      formData.append('files', fileStream);
-    } */
+      const fileStream = fs.createReadStream(`files/${fileName}`)
+      formData.append('files', fileStream)
+    }
     requestParams.body = formData
     return next()
   } catch (error) {
@@ -21,5 +40,6 @@ function enviarPDF (requestParams, context, ee, next) {
   }
 }
 module.exports = {
-  enviarPDF
+  enviarPDF,
+  enviarMergePDF
 }
