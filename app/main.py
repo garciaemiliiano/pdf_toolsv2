@@ -2,6 +2,7 @@ import uvicorn
 import fastapi
 import traceback
 import sys, os
+import asyncio
 from fastapi import FastAPI, File, UploadFile, APIRouter, status, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
@@ -14,31 +15,43 @@ from fn import download_file, delete_file, _merge, _count_pages, _formatError
 
 app = FastAPI(openapi_tags=tags_metadata)
 app.mount("/tmp", StaticFiles(directory="/tmp"), name="temp")
+concurrency_limit = asyncio.Semaphore(1)
 
 
-@app.post("/count_pages/", status_code=status.HTTP_200_OK, tags=["count_pages"])
+@app.post("/count_pages", status_code=status.HTTP_200_OK, tags=["count_pages"])
 async def count_pages(file: UploadFile):
-    root_path = settings.upload_folder
-    filename = file.filename
-    file_content = file.file
-    if file_content:
+    async with concurrency_limit:
         try:
-            filename = await download_file(file, root_path, filename)
-            pages = await _count_pages(os.path.join(root_path, filename))
-            await delete_file(os.path.join(root_path, filename))
-            return {"nombre_archivo": filename, "cantidad_paginas": pages}
+            root_path = settings.upload_folder
+            filename = file.filename
+            file_content = file.file
+            if file_content:
+                try:
+                    filename = await download_file(file, root_path, filename)
+                    pages = await _count_pages(os.path.join(root_path, filename))
+                    await delete_file(os.path.join(root_path, filename))
+                    return {"nombreArchivo": filename, "cantidadPaginas": pages}
+                except BaseException as exception:
+                    error_type, file_error, line_error = _formatError()
+                    error = _Error(exception, error_type, file_error, line_error)
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail=error.returnError(),
+                    ) from exception
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="error_file_missing",
+                )
+
         except BaseException as exception:
             error_type, file_error, line_error = _formatError()
             error = _Error(exception, error_type, file_error, line_error)
+            print(error.returnError())
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=error.returnError(),
             ) from exception
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="error_file_missing",
-        )
 
 
 @app.post("/merge_files/", status_code=status.HTTP_201_CREATED, tags=["merge"])

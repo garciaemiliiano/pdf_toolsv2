@@ -2,4 +2,4 @@ __pycache__/
 app/__pycache__/
 *.pdf
 .vscode
-/python-artillery
+/test/node_modules

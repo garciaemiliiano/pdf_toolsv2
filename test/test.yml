@@ -1,0 +1,14 @@
+config:
+  target: "http://0.0.0.0:8000"
+  phases:
+    - duration: 100
+      arrivalRate: 50
+      maxVusers: 50
+      name: Proceso de importación express
+  processor: "./test.js"
+scenarios:
+  - name: "PDF"
+    flow:
+      - post:
+          url: "/count_pages"
+          beforeRequest: enviarPDF

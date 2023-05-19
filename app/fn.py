@@ -1,7 +1,7 @@
-import sys, os, os.path, PyPDF2, pdfreader, uuid, coloredlogs, logging, unidecode, shutil, aiofiles, aiofile, asyncio
+import sys, os, os.path, pypdf, pdfreader, uuid, coloredlogs, logging, unidecode, shutil, aiofiles, aiofile, asyncio
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
-from PyPDF2 import PdfFileMerger, PdfFileReader
+from pypdf import PdfFileMerger, PdfFileReader
 from pdfreader import PDFDocument
 from classes import _Error
 from aiofile import AIOFile, LineReader, Writer
@@ -53,8 +53,8 @@ async def format_file_name(string: str):
 async def _count_pages(file_path: str):
     try:
         pdfFileObj = open(file_path, "rb")
-        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-        return pdfReader.numPages
+        pdf = pypdf.PdfReader(pdfFileObj)
+        return len(pdf.pages)
     except BaseException as exception:
         logging.error("Exception occurred", exc_info=True)
         raise exception
